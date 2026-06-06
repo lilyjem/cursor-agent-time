@@ -1,5 +1,8 @@
 # Agent Time
 
+[![Release](https://img.shields.io/github/v/release/lilyjem/cursor-agent-time?label=release)](https://github.com/lilyjem/cursor-agent-time/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 在 Cursor 底部状态栏显示最近一轮 agent 运行耗时（如 `⏱ 42s`）。
 
 ## 工作原理
@@ -9,7 +12,15 @@
 ## 前提
 - Cursor ≥ 1.7、`node` 在 PATH 上、Windows/macOS/Linux 均可。
 
-## 安装
+## 从 GitHub Release 安装（推荐）
+1. 到 [Releases](https://github.com/lilyjem/cursor-agent-time/releases) 下载最新 `.vsix`。
+2. 命令面板执行 `Extensions: Install from VSIX...` 选择该文件，或在终端执行：
+
+```
+cursor --install-extension cursor-agent-time-0.1.0.vsix
+```
+
+## 从源码安装
 见底部「构建与安装」。
 
 ## 构建与安装
