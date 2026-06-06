@@ -3,13 +3,15 @@
 const os = require('os');
 const path = require('path');
 const { readStdin } = require('./lib/stdin');
+const { parseHookInput } = require('./lib/parse');
 const { recordStart } = require('./lib/runs');
 
 const DATA_DIR = path.join(os.homedir(), '.cursor', 'agent-time');
 
 (async () => {
   try {
-    const input = JSON.parse((await readStdin()) || '{}');
+    // parseHookInput 会剥掉 Cursor(Windows) 加在 stdin 上的 UTF-8 BOM 再解析
+    const input = parseHookInput(await readStdin());
     if (input.conversation_id) {
       recordStart(DATA_DIR, input.conversation_id, Date.now());
     }
