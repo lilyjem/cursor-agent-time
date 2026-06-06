@@ -1,0 +1,36 @@
+{
+  "name": "cursor-agent-time",
+  "displayName": "Agent Time",
+  "description": "在状态栏显示最近一轮 Cursor Agent 运行耗时",
+  "version": "0.0.1",
+  "publisher": "local",
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Other"],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./out/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "Agent Time",
+      "properties": {
+        "agentTime.autoManageHooks": {
+          "type": "boolean",
+          "default": true,
+          "description": "激活时自动配置 ~/.cursor/hooks.json 中的计时 hooks"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "test": "vitest run",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5",
+    "vitest": "^2",
+    "@vscode/vsce": "^3"
+  }
+}
