@@ -22,6 +22,7 @@ describe('runs', () => {
     expect(state.durationMs).toBe(42000);
     expect(state.status).toBe('completed');
     expect(state.conversationId).toBe('conv-1');
+    expect(state.startedAt).toBe(new Date(1000).toISOString());
     const runs = readJson(runsPath(dir), { starts: {} });
     expect(runs.starts['conv-1']).toBeUndefined();
   });
