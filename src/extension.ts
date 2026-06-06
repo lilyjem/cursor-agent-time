@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { formatDuration } from './format';
+import { formatDuration, formatDateTime } from './format';
 import { readState } from './state';
 import { ensureHooksInstalled } from './install-hooks';
 
@@ -44,10 +44,16 @@ function render(): void {
     return;
   }
   statusItem.text = `$(clock) ${formatDuration(state.durationMs)}`;
-  const ended = state.endedAt ? new Date(state.endedAt).toLocaleTimeString() : '';
-  statusItem.tooltip =
-    `上一轮 agent 耗时 ${formatDuration(state.durationMs)}\n` +
-    `结束于 ${ended}\n状态：${state.status}`;
+  const started = formatDateTime(state.startedAt);
+  const ended = formatDateTime(state.endedAt);
+  // 逐行拼装：开始时间缺失（旧数据）时省略该行，避免显示无意义占位
+  const lines = [`上一轮 agent 耗时 ${formatDuration(state.durationMs)}`];
+  if (started) {
+    lines.push(`开始于 ${started}`);
+  }
+  lines.push(`结束于 ${ended}`);
+  lines.push(`状态：${state.status}`);
+  statusItem.tooltip = lines.join('\n');
 }
 
 function startWatching(): void {

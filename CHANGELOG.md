@@ -3,6 +3,14 @@
 本项目遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.2.0] - 2026-06-06
+
+### 新增
+- 状态栏悬浮 tooltip 增加一行「开始于 <完整日期时间>」，展示最近一轮 agent 的开始时间（如 `开始于 2026-06-06 16:22:01`）；读到不含开始时间的旧数据时自动省略该行。
+
+### 变更
+- tooltip 中「结束于」由原来的「时:分:秒」统一改为完整日期时间格式（`YYYY-MM-DD HH:mm:ss`），与「开始于」保持一致。状态栏主文本（`⏱ 耗时`）不变。
+
 ## [0.1.1] - 2026-06-06
 
 ### 修复
@@ -19,5 +27,6 @@
 - 跨平台支持（Windows / macOS / Linux）。
 - 备选手动安装脚本 `scripts/install.mjs`。
 
+[0.2.0]: https://github.com/lilyjem/cursor-agent-time/releases/tag/v0.2.0
 [0.1.1]: https://github.com/lilyjem/cursor-agent-time/releases/tag/v0.1.1
 [0.1.0]: https://github.com/lilyjem/cursor-agent-time/releases/tag/v0.1.0

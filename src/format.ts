@@ -16,3 +16,23 @@ export function formatDuration(ms: number): string {
   const min = totalMin % 60;
   return `${hours}h${min}m`;
 }
+
+// 把 ISO 时间字符串格式化为本地时区的 "YYYY-MM-DD HH:mm:ss"；
+// 空串/非字符串/无法解析一律返回空串，由调用方决定是否展示。
+export function formatDateTime(iso: string): string {
+  if (typeof iso !== 'string' || iso === '') {
+    return '';
+  }
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) {
+    return '';
+  }
+  const pad = (n: number): string => String(n).padStart(2, '0');
+  const year = d.getFullYear();
+  const month = pad(d.getMonth() + 1);
+  const day = pad(d.getDate());
+  const hour = pad(d.getHours());
+  const minute = pad(d.getMinutes());
+  const second = pad(d.getSeconds());
+  return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+}

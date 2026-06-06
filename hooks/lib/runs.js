@@ -31,6 +31,7 @@ function recordStop(dataDir, conversationId, status, nowMs) {
     version: 1,
     durationMs,
     status,
+    startedAt: new Date(start).toISOString(),
     endedAt: new Date(nowMs).toISOString(),
     conversationId,
   });
