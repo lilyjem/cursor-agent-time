@@ -9,3 +9,4 @@ vitest.config.ts
 .gitignore
 .git/**
 node_modules/**
+scripts/**

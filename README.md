@@ -25,3 +25,12 @@
 
 ## 卸载
 卸载扩展后，可手动从 `~/.cursor/hooks.json` 删除 `agent-time` 相关条目，并删除 `~/.cursor/hooks/agent-time/` 与 `~/.cursor/agent-time/`。
+
+### 手动配置（当关闭 agentTime.autoManageHooks 时）
+若关闭了自动配置，可手动运行（需先 `npm run compile`）：
+
+```
+node scripts/install.mjs
+```
+
+它复用扩展同一套逻辑，把计时 hooks 写入 `~/.cursor`。

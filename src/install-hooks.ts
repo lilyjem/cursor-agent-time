@@ -1,37 +1,59 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-const START_CMD = 'node ./hooks/agent-time/start.js';
-const STOP_CMD = 'node ./hooks/agent-time/stop.js';
-const START_MARK = 'hooks/agent-time/start.js';
-const STOP_MARK = 'hooks/agent-time/stop.js';
+// 把路径统一成正斜杠：Windows 下 node 也能识别，且避免 JSON 里转义反斜杠
+function toPosix(p: string): string {
+  return p.split(path.sep).join('/');
+}
 
-// 在某事件数组里幂等确保存在我们的条目；返回是否发生变更
-function ensureEntry(hooks: any, event: string, mark: string, command: string): boolean {
-  const arr = Array.isArray(hooks[event]) ? hooks[event] : [];
-  const exists = arr.some(
-    (e: any) => e && typeof e.command === 'string' && e.command.includes(mark)
+// 根据 home 目录算出两个 hook 脚本的绝对命令（用引号包裹以兼容含空格的路径）
+function buildCommands(homeDir: string): { startCmd: string; stopCmd: string } {
+  const startPath = toPosix(path.join(homeDir, '.cursor', 'hooks', 'agent-time', 'start.js'));
+  const stopPath = toPosix(path.join(homeDir, '.cursor', 'hooks', 'agent-time', 'stop.js'));
+  return {
+    startCmd: `node "${startPath}"`,
+    stopCmd: `node "${stopPath}"`,
+  };
+}
+
+// 判断某事件数组里是否已存在指向给定脚本文件名的本插件条目（路径分隔符无关）
+function hasEntry(arr: any[], fileMark: string): boolean {
+  return arr.some(
+    (e) =>
+      e &&
+      typeof e.command === 'string' &&
+      e.command.includes('agent-time') &&
+      e.command.includes(fileMark)
   );
+}
+
+// 在某事件数组里幂等确保存在本插件条目；返回是否变更。不修改原数组。
+function ensureEntry(hooks: any, event: string, fileMark: string, command: string): boolean {
+  const arr = Array.isArray(hooks[event]) ? [...hooks[event]] : [];
   hooks[event] = arr;
-  if (exists) {
+  if (hasEntry(arr, fileMark)) {
     return false;
   }
-  arr.push({ command });
+  // timeout 兜底：即使脚本异常，也不会长时间拖住 agent
+  arr.push({ command, timeout: 5 });
   return true;
 }
 
-// 纯函数：把本插件的 hook 条目幂等合并进现有配置
-export function mergeHooksConfig(existing: any): { config: any; changed: boolean } {
-  const config = existing && typeof existing === 'object' ? existing : {};
-  if (typeof config.version !== 'number') {
-    config.version = 1;
-  }
-  if (!config.hooks || typeof config.hooks !== 'object') {
-    config.hooks = {};
-  }
+// 纯函数：把本插件的 hook 条目幂等合并进现有配置（不就地修改入参）
+export function mergeHooksConfig(
+  existing: any,
+  commands: { startCmd: string; stopCmd: string }
+): { config: any; changed: boolean } {
+  const src = existing && typeof existing === 'object' ? existing : {};
+  // 浅拷贝顶层与 hooks，避免改动调用方传入的对象
+  const config: any = { ...src };
+  config.version = typeof config.version === 'number' ? config.version : 1;
+  config.hooks =
+    config.hooks && typeof config.hooks === 'object' ? { ...config.hooks } : {};
+
   let changed = false;
-  changed = ensureEntry(config.hooks, 'beforeSubmitPrompt', START_MARK, START_CMD) || changed;
-  changed = ensureEntry(config.hooks, 'stop', STOP_MARK, STOP_CMD) || changed;
+  changed = ensureEntry(config.hooks, 'beforeSubmitPrompt', 'start.js', commands.startCmd) || changed;
+  changed = ensureEntry(config.hooks, 'stop', 'stop.js', commands.stopCmd) || changed;
   return { config, changed };
 }
 
@@ -49,7 +71,7 @@ function copyDir(src: string, dest: string): void {
   }
 }
 
-// 副作用入口：复制脚本 + 幂等写 hooks.json
+// 副作用入口：复制脚本 + 幂等写 hooks.json（命令用绝对路径，免疫 cwd 变化）
 export function ensureHooksInstalled(homeDir: string, extHooksDir: string): void {
   const targetDir = path.join(homeDir, '.cursor', 'hooks', 'agent-time');
   copyDir(extHooksDir, targetDir);
@@ -61,7 +83,7 @@ export function ensureHooksInstalled(homeDir: string, extHooksDir: string): void
   } catch {
     existing = {};
   }
-  const { config, changed } = mergeHooksConfig(existing);
+  const { config, changed } = mergeHooksConfig(existing, buildCommands(homeDir));
   if (changed) {
     fs.mkdirSync(path.dirname(hooksJsonPath), { recursive: true });
     fs.writeFileSync(hooksJsonPath, JSON.stringify(config, null, 2), 'utf8');
