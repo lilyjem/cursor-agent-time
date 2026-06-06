@@ -1,0 +1,9 @@
+# 依赖与构建产物
+node_modules/
+out/
+dist/
+*.vsix
+
+# 日志与临时文件
+*.log
+.DS_Store
