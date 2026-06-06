@@ -29,13 +29,27 @@ describe('readState', () => {
   it('合法内容返回结构化对象', () => {
     fs.writeFileSync(
       file,
-      JSON.stringify({ durationMs: 42000, status: 'completed', endedAt: '2026-06-06T00:00:00.000Z', conversationId: 'c' })
+      JSON.stringify({
+        durationMs: 42000,
+        status: 'completed',
+        startedAt: '2026-06-06T00:00:00.000Z',
+        endedAt: '2026-06-06T00:00:42.000Z',
+        conversationId: 'c',
+      })
     );
     expect(readState(file)).toEqual({
       durationMs: 42000,
       status: 'completed',
-      endedAt: '2026-06-06T00:00:00.000Z',
+      startedAt: '2026-06-06T00:00:00.000Z',
+      endedAt: '2026-06-06T00:00:42.000Z',
       conversationId: 'c',
     });
+  });
+  it('旧数据缺 startedAt 时回退空串', () => {
+    fs.writeFileSync(
+      file,
+      JSON.stringify({ durationMs: 42000, status: 'completed', endedAt: '2026-06-06T00:00:42.000Z', conversationId: 'c' })
+    );
+    expect(readState(file)?.startedAt).toBe('');
   });
 });

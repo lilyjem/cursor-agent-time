@@ -4,6 +4,7 @@ import * as fs from 'fs';
 export interface RunState {
   durationMs: number;
   status: string;
+  startedAt: string;
   endedAt: string;
   conversationId: string;
 }
@@ -18,6 +19,7 @@ export function readState(filePath: string): RunState | null {
     return {
       durationMs: obj.durationMs,
       status: typeof obj.status === 'string' ? obj.status : 'completed',
+      startedAt: typeof obj.startedAt === 'string' ? obj.startedAt : '',
       endedAt: typeof obj.endedAt === 'string' ? obj.endedAt : '',
       conversationId: typeof obj.conversationId === 'string' ? obj.conversationId : '',
     };
