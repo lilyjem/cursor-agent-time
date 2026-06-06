@@ -28,11 +28,11 @@ export function formatDateTime(iso: string): string {
     return '';
   }
   const pad = (n: number): string => String(n).padStart(2, '0');
-  const Y = d.getFullYear();
-  const M = pad(d.getMonth() + 1);
-  const D = pad(d.getDate());
-  const h = pad(d.getHours());
-  const m = pad(d.getMinutes());
-  const s = pad(d.getSeconds());
-  return `${Y}-${M}-${D} ${h}:${m}:${s}`;
+  const year = d.getFullYear();
+  const month = pad(d.getMonth() + 1);
+  const day = pad(d.getDate());
+  const hour = pad(d.getHours());
+  const minute = pad(d.getMinutes());
+  const second = pad(d.getSeconds());
+  return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
 }
