@@ -52,4 +52,11 @@ describe('readState', () => {
     );
     expect(readState(file)?.startedAt).toBe('');
   });
+  it('startedAt 非字符串时回退空串', () => {
+    fs.writeFileSync(
+      file,
+      JSON.stringify({ durationMs: 42000, status: 'completed', startedAt: 123, endedAt: '2026-06-06T00:00:42.000Z', conversationId: 'c' })
+    );
+    expect(readState(file)?.startedAt).toBe('');
+  });
 });
